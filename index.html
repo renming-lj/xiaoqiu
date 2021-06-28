@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<style type="text/css">
+		html,body{
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+		#c{
+			background: url(images/bg.jpg) no-repeat;
+			background-position: center center;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+
+	<script type="text/javascript">
+		c.width = window.innerWidth;
+		c.height = window.innerHeight;
+		window.onresize = function () {
+			c.width = this.innerWidth;
+			c.height = this.innerHeight;
+		}
+		//2d
+		var ctx = c.getContext('2d');
+		//小球类
+		function Ball(){
+			this.x = random(0,window.innerWidth);
+			this.y = random(0,window.innerHeight);
+			this.r = random(2,6);
+			//运动速度
+			this.dx = random(-8,8);
+			this.dy = random(-5,5);
+			//运动方向(控制小球，碰到边缘反弹)
+			this.dirx = 1;
+			this.diry = 1;
+			//颜色
+			this.color = `rgba(255,255,255,.8)`;
+			// ${random(0,255)},${random(0,255)},${random(0,255)}
+			//绘制方法
+			this.draw = function () {
+
+				ctx.beginPath();
+				ctx.fillStyle = this.color;
+				ctx.arc(this.x,this.y,this.r,0,2*Math.PI,false);
+				ctx.closePath();
+				ctx.fill();
+			}
+			//移动
+			this.move = function () {
+				this.x += this.dx*this.dirx;
+				//临界条件
+				
+				if(this.x<0||this.x>window.innerWidth){
+					this.dirx = -this.dirx;
+				}
+				this.y += this.dy*this.diry;
+				
+				if(this.y>window.innerHeight||this.y<0){
+					this.diry = -this.diry;
+				}
+			}
+		}
+
+		// 随机数的工具函数
+		function random(min,max){
+			return Math.random()*(max-min)+min;
+		}
+
+		var balls = [];
+		//200个小球
+		for(var i=0;i<200;i++){
+			var b1 = new Ball();
+			balls.push(b1);
+			b1.draw();
+		}
+
+		// 定时器
+		setInterval(function () {
+			ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+			for(var k=0;k<balls.length;k++){
+				balls[k].move();
+				balls[k].draw();
+				//连线
+				for(var j=k;j<balls.length;j++){
+					if(Math.abs(balls[k].x-balls[j].x)<80&&Math.abs(balls[k].y-balls[j].y)<80){
+						ctx.beginPath();
+						ctx.strokeStyle = balls[k].color;
+						ctx.moveTo(balls[k].x,balls[k].y);
+						ctx.lineTo(balls[j].x,balls[j].y);
+						ctx.stroke();
+						ctx.closePath();
+					}
+				}
+			}
+		},42);
+	</script>
+</body>
+</html>
